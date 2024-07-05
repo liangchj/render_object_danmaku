@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:render_object_danmaku/models/canvas_danmaku_item.dart';
 import 'package:render_object_danmaku/models/danmaku_item.dart';
 import 'package:render_object_danmaku/models/danmaku_option.dart';
+import 'package:render_object_danmaku/models/danmaku_show_type.dart';
 
 class Utils {
   static void danmakuItemDraw(CanvasDanmakuItem canvasDanmakuItem,
@@ -12,16 +13,34 @@ class Utils {
       if (canvasDanmakuItem.paragraph == null) {
         canvasDanmakuItem.updateParagraph(option);
       }
-
-      if ([1, 2, 3].contains(canvasDanmakuItem.danmakuItem.mode)) {
+      int elapsedTime = canvasDanmakuItem.danmakuItem.time - currentTime;
+      // 右向左
+      if (DanmakuShowType.r2l.modeList
+          .contains(canvasDanmakuItem.danmakuItem.mode)) {
         // 开始位置
         double startPosition = size.width;
-        int elapsedTime = canvasDanmakuItem.danmakuItem.time - currentTime;
+
         double endPosition = -canvasDanmakuItem.width;
         double distance = startPosition - endPosition;
 
         canvasDanmakuItem.xPosition =
             startPosition + (elapsedTime / option.duration) * distance;
+
+        if (canvasDanmakuItem.xPosition < -canvasDanmakuItem.width ||
+            canvasDanmakuItem.xPosition > size.width) {
+          return;
+        }
+      }
+      // 左向右
+      if (DanmakuShowType.l2r.modeList
+          .contains(canvasDanmakuItem.danmakuItem.mode)) {
+        // 开始位置
+        double startPosition = -canvasDanmakuItem.width;
+        double endPosition = size.width;
+        double distance = endPosition - startPosition;
+
+        canvasDanmakuItem.xPosition =
+            startPosition - (elapsedTime / option.duration) * distance;
 
         if (canvasDanmakuItem.xPosition < -canvasDanmakuItem.width ||
             canvasDanmakuItem.xPosition > size.width) {

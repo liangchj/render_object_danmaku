@@ -8,7 +8,7 @@ class DanmakuItem {
   // 	视频内弹幕出现时间	毫秒
   int time;
   // 	弹幕类型
-  final int mode;
+  int mode;
   // 弹幕字号
   final double fontSize;
   // 弹幕颜色
@@ -34,10 +34,11 @@ class DanmakuItem {
     this.sendUserId,
     this.backgroundColor,
     this.boldColor,
-  }) {
-    backgroundColor ??= Colors.black.withOpacity(0.6).value;
-    boldColor ??= Colors.redAccent.value;
-  }
+  });
+  // {
+  //   backgroundColor ??= Colors.black.withOpacity(0.6).value;
+  //   boldColor ??= Colors.redAccent.value;
+  // }
 
   factory DanmakuItem.fromJson(Map<String, dynamic> json) => DanmakuItem(
         danmakuId: json["danmakuId"],

@@ -14,6 +14,10 @@ class _DanmakuTestState extends State<DanmakuTest> {
   late DanmakuController _controller;
   double fontSize = 16.0;
   double area = 1.0;
+  bool _filterTop = false;
+  bool _filterBottom = false;
+  bool _filterScroll = false;
+  bool _filterColour = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,6 +63,69 @@ class _DanmakuTestState extends State<DanmakuTest> {
                     _controller.onUpdateOption(
                         _controller.option.copyWith(area: area));
                   },
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+                child: Row(
+                  children: [
+                    Column(
+                      children: [
+                        Text(_filterTop ? "显示顶部" : "隐藏顶部"),
+                        Switch(
+                            value: _filterTop,
+                            onChanged: (flag) {
+                              setState(() {
+                                _filterTop = flag;
+                              });
+                              _controller.updateOption(_controller.option
+                                  .copyWith(filterTop: _filterTop));
+                            }),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Text(_filterBottom ? "显示底部" : "隐藏底部"),
+                        Switch(
+                            value: _filterBottom,
+                            onChanged: (flag) {
+                              setState(() {
+                                _filterBottom = flag;
+                              });
+                              _controller.updateOption(_controller.option
+                                  .copyWith(filterBottom: _filterBottom));
+                            }),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Text(_filterScroll ? "显示滚动" : "隐藏滚动"),
+                        Switch(
+                            value: _filterScroll,
+                            onChanged: (flag) {
+                              setState(() {
+                                _filterScroll = flag;
+                              });
+                              _controller.updateOption(_controller.option
+                                  .copyWith(filterScroll: _filterScroll));
+                            }),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Text(_filterTop ? "显示彩色" : "隐藏彩色"),
+                        Switch(
+                            value: _filterColour,
+                            onChanged: (flag) {
+                              setState(() {
+                                _filterColour = flag;
+                              });
+                              _controller.updateOption(_controller.option
+                                  .copyWith(filterColour: _filterColour));
+                            }),
+                      ],
+                    ),
+                  ],
                 ),
               ),
               AspectRatio(

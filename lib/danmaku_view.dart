@@ -75,6 +75,11 @@ class _DanmakuViewState extends State<DanmakuView>
 
   DateTime? _startTime;
 
+  /// 点击可以悬停时长（毫秒）
+  int _clickPauseTimeMs = 5000;
+  // 点击的定时器
+  Timer? _clickTimer;
+
   @override
   void initState() {
     // 计时器初始化
@@ -109,6 +114,7 @@ class _DanmakuViewState extends State<DanmakuView>
 
   @override
   void dispose() {
+    _clickTimer?.cancel();
     _timer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     _animationController.dispose();
@@ -166,6 +172,7 @@ class _DanmakuViewState extends State<DanmakuView>
 
   /// 点击弹幕幕布
   void _clickCanvas(Offset clickOffset) {
+    _clickTimer?.cancel();
     CanvasDanmakuItem? clickCanvasDanmakuItem;
     if (_clickCanvasDanmakuItems.isNotEmpty) {
       clickCanvasDanmakuItem =
@@ -202,6 +209,24 @@ class _DanmakuViewState extends State<DanmakuView>
         _clickCanvasDanmakuItems.add(clickCanvasDanmakuItem);
       }
       _clickDanmakuId = clickCanvasDanmakuItem?.danmakuItem.danmakuId ?? "";
+      if (clickCanvasDanmakuItem != null) {
+        _clickTimer = Timer(Duration(milliseconds: _clickPauseTimeMs), () {
+          if (clickCanvasDanmakuItem!.usedTimeRatio >= 1.0) {
+            clickCanvasDanmakuItem.danmakuItem.time =
+                _controller.runTime - _option.duration;
+          } else {
+            clickCanvasDanmakuItem.danmakuItem.time = (_controller.runTime +
+                    _option.duration *
+                        (1.0 - clickCanvasDanmakuItem.usedTimeRatio) -
+                    _option.duration)
+                .ceil()
+                .abs();
+          }
+          setState(() {
+            _clickDanmakuId = "";
+          });
+        });
+      }
     });
   }
 
@@ -435,16 +460,29 @@ class _DanmakuViewState extends State<DanmakuView>
     }
     if (msIntervalItems.isNotEmpty) {
       msIntervalItems.sort((a, b) => a.danmakuItem.time - b.danmakuItem.time);
+
       _updateTrackDanmakuItemPosition(msIntervalItems);
     }
     _canvasDanmakuItems.removeWhere((item) {
       // 移除屏幕了或者耗时时长比例超过100%
-      bool flag = item.xPosition + item.width < 0 || item.usedTimeRatio >= 1.0;
+      bool flag =
+          (DanmakuShowType.r2l.modeList.contains(item.danmakuItem.mode) &&
+                  item.xPosition + item.width <= 0) ||
+              (DanmakuShowType.l2r.modeList.contains(item.danmakuItem.mode) &&
+                  item.xPosition >= _viewWidth) ||
+              item.usedTimeRatio >= 1.0 ||
+              _controller.runTime >= _option.duration + item.danmakuItem.time;
       return flag;
     });
 
     _clickCanvasDanmakuItems.removeWhere((item) {
-      bool flag = item.xPosition + item.width < 0 || item.usedTimeRatio >= 1.0;
+      bool flag =
+          (DanmakuShowType.r2l.modeList.contains(item.danmakuItem.mode) &&
+                  item.xPosition + item.width <= 0) ||
+              (DanmakuShowType.l2r.modeList.contains(item.danmakuItem.mode) &&
+                  item.xPosition >= _viewWidth) ||
+              item.usedTimeRatio >= 1.0 ||
+              _controller.runTime >= _option.duration + item.danmakuItem.time;
       return flag;
     });
 
@@ -465,6 +503,10 @@ class _DanmakuViewState extends State<DanmakuView>
       if ([...DanmakuShowType.top.modeList, ...DanmakuShowType.bottom.modeList]
           .contains(item.danmakuItem.mode)) {
         item.xPosition = (_viewWidth - item.width) / 2;
+      } else if (DanmakuShowType.r2l.modeList.contains(item.danmakuItem.mode)) {
+        item.xPosition = _viewWidth;
+      } else if (DanmakuShowType.l2r.modeList.contains(item.danmakuItem.mode)) {
+        item.xPosition = -item.width;
       }
       if (_option.massiveMode) {
         var randomYPosition =
@@ -479,10 +521,8 @@ class _DanmakuViewState extends State<DanmakuView>
           if (canAdd) {
             item.yPosition = yPosition;
             item.visibleTick = _tick;
-            if (item.paragraph == null) {
-              item.updateParagraph(_option);
-            }
             _canvasDanmakuItems.add(item);
+
             break;
           }
         }
@@ -541,11 +581,9 @@ class _DanmakuViewState extends State<DanmakuView>
       if (item.visibleTick != _tick) {
         continue;
       }
-      // 滚动弹幕
-      if ([...DanmakuShowType.l2r.modeList, ...DanmakuShowType.r2l.modeList]
-              .contains(item.danmakuItem.mode) &&
-          [...DanmakuShowType.l2r.modeList, ...DanmakuShowType.r2l.modeList]
-              .contains(mode)) {
+      // 滚动弹幕（右向左）
+      if (DanmakuShowType.r2l.modeList.contains(item.danmakuItem.mode) &&
+          DanmakuShowType.r2l.modeList.contains(mode)) {
         if (item.yPosition == yPosition &&
             item.danmakuItem.danmakuId !=
                 canvasDanmakuItem.danmakuItem.danmakuId) {
@@ -558,6 +596,29 @@ class _DanmakuViewState extends State<DanmakuView>
           if (item.width < newDanmakuWidth) {
             if ((1 -
                     ((_viewWidth - item.xPosition) /
+                        (item.width + _viewWidth))) >
+                ((_viewWidth) / (_viewWidth + newDanmakuWidth))) {
+              flag = false;
+              break;
+            }
+          }
+        }
+      }
+      // 滚动弹幕（左向右）
+      if (DanmakuShowType.l2r.modeList.contains(item.danmakuItem.mode) &&
+          DanmakuShowType.l2r.modeList.contains(mode)) {
+        if (item.yPosition == yPosition &&
+            item.danmakuItem.danmakuId !=
+                canvasDanmakuItem.danmakuItem.danmakuId) {
+          // 首先保证进入屏幕时不发生重叠，其次保证知道移出屏幕前不与速度慢的弹幕(弹幕宽度较小)发生重叠
+          // 还未完全进入
+          if (item.xPosition <= 0) {
+            flag = false;
+            break;
+          }
+          if (item.width < newDanmakuWidth) {
+            if ((1 -
+                    ((item.xPosition - item.width) /
                         (item.width + _viewWidth))) >
                 ((_viewWidth) / (_viewWidth + newDanmakuWidth))) {
               flag = false;
@@ -594,9 +655,6 @@ class _DanmakuViewState extends State<DanmakuView>
       }
       return ClipRect(
         child: GestureDetector(
-          onTap: () {
-            debugPrint("点击");
-          },
           onTapDown: (details) {
             debugPrint("点击了弹幕坐标：${details.localPosition}");
             _clickCanvas(details.localPosition);
