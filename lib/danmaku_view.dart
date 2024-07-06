@@ -347,6 +347,12 @@ class _DanmakuViewState extends State<DanmakuView>
     _option = option;
     _controller.option = _option;
 
+    if (!_option.clickItem) {
+      setState(() {
+        _clickDanmakuId = "";
+      });
+    }
+
     /// 清理已经存在的 Paragraph 缓存
     _animationController.stop();
     // 显示区域或文本大小发生变化时更新弹幕轨道信息
@@ -656,37 +662,44 @@ class _DanmakuViewState extends State<DanmakuView>
       return ClipRect(
         child: Listener(
           onPointerDown: (details) {
-            debugPrint("点击了弹幕坐标：${details.localPosition}");
-            _clickCanvas(details.localPosition);
+            if (_option.clickItem) {
+              debugPrint("点击了弹幕坐标：${details.localPosition}");
+              _clickCanvas(details.localPosition);
+            }
           },
           // onTapDown: (details) {
           //   debugPrint("点击了弹幕坐标：${details.localPosition}");
           //   _clickCanvas(details.localPosition);
           // },
-          child: Stack(
-            children: [
-              RepaintBoundary(
-                child: AnimatedBuilder(
-                  animation: _animationController,
-                  builder: (context, child) {
-                    _controller.runTime += _startTime == null
-                        ? 0
-                        : DateTime.now().difference(_startTime!).inMilliseconds;
-                    _startTime = DateTime.now();
-                    return DanmakuRenderObjectWidget(
-                      animateProgress: _animationController.value,
-                      option: _option,
-                      canvasDanmakuItems: _canvasDanmakuItems,
-                      clickCanvasDanmakuItems: _clickCanvasDanmakuItems,
-                      clickDanmakuId: _clickDanmakuId,
-                      running: _controller.running,
-                      currentTime: _controller.runTime,
-                      visibleTick: _tick,
-                    );
-                  },
-                ),
-              )
-            ],
+          child: Opacity(
+            opacity: _option.opacity,
+            child: Stack(
+              children: [
+                RepaintBoundary(
+                  child: AnimatedBuilder(
+                    animation: _animationController,
+                    builder: (context, child) {
+                      _controller.runTime += _startTime == null
+                          ? 0
+                          : DateTime.now()
+                              .difference(_startTime!)
+                              .inMilliseconds;
+                      _startTime = DateTime.now();
+                      return DanmakuRenderObjectWidget(
+                        animateProgress: _animationController.value,
+                        option: _option,
+                        canvasDanmakuItems: _canvasDanmakuItems,
+                        clickCanvasDanmakuItems: _clickCanvasDanmakuItems,
+                        clickDanmakuId: _clickDanmakuId,
+                        running: _controller.running,
+                        currentTime: _controller.runTime,
+                        visibleTick: _tick,
+                      );
+                    },
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       );

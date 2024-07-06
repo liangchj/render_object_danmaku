@@ -36,6 +36,8 @@ class DanmakuOption {
   final bool filterRepeat;
   // 过滤词语
   final List<String>? filterWords;
+  // 是否可以点击弹幕
+  final bool clickItem;
 
   DanmakuOption({
     this.fontSize = 16.0,
@@ -53,6 +55,7 @@ class DanmakuOption {
     this.filterColour = false,
     this.filterRepeat = false,
     this.filterWords,
+    this.clickItem = false,
   });
 
   DanmakuOption copyWith({
@@ -71,6 +74,7 @@ class DanmakuOption {
     bool? filterColour,
     bool? filterRepeat,
     List<String>? filterWords,
+    bool? clickItem,
   }) {
     return DanmakuOption(
       fontSize: fontSize ?? this.fontSize,
@@ -88,6 +92,7 @@ class DanmakuOption {
       filterColour: filterColour ?? this.filterColour,
       filterRepeat: filterRepeat ?? this.filterRepeat,
       filterWords: filterWords ?? this.filterWords,
+      clickItem: clickItem ?? this.clickItem,
     );
   }
 }
