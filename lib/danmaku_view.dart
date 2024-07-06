@@ -304,7 +304,7 @@ class _DanmakuViewState extends State<DanmakuView>
 
   /// 开始弹幕
   void start({int? ms}) {
-    _controller.runTime = ms ?? 0;
+    _controller.runTime = (ms ?? 0) + _option.adjustTimeMs;
     _controller.running = true;
     _startTime = DateTime.now();
     _animationController.repeat();
@@ -347,10 +347,8 @@ class _DanmakuViewState extends State<DanmakuView>
     _option = option;
     _controller.option = _option;
 
-    if (!_option.clickItem) {
-      setState(() {
-        _clickDanmakuId = "";
-      });
+    if (_option.adjustTimeMs != oldOption.adjustTimeMs) {
+      _controller.runTime += _option.adjustTimeMs;
     }
 
     /// 清理已经存在的 Paragraph 缓存
@@ -432,7 +430,11 @@ class _DanmakuViewState extends State<DanmakuView>
     }
 
     _animationController.repeat();
-    setState(() {});
+    setState(() {
+      if (!_option.clickItem) {
+        _clickDanmakuId = "";
+      }
+    });
   }
 
   /// 清空弹幕

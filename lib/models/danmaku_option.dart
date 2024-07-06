@@ -38,6 +38,8 @@ class DanmakuOption {
   final List<String>? filterWords;
   // 是否可以点击弹幕
   final bool clickItem;
+  // 调整弹幕时间(毫秒)
+  final int adjustTimeMs;
 
   DanmakuOption({
     this.fontSize = 16.0,
@@ -56,6 +58,7 @@ class DanmakuOption {
     this.filterRepeat = false,
     this.filterWords,
     this.clickItem = false,
+    this.adjustTimeMs = 0,
   });
 
   DanmakuOption copyWith({
@@ -75,6 +78,7 @@ class DanmakuOption {
     bool? filterRepeat,
     List<String>? filterWords,
     bool? clickItem,
+    int? adjustTimeMs,
   }) {
     return DanmakuOption(
       fontSize: fontSize ?? this.fontSize,
@@ -93,6 +97,7 @@ class DanmakuOption {
       filterRepeat: filterRepeat ?? this.filterRepeat,
       filterWords: filterWords ?? this.filterWords,
       clickItem: clickItem ?? this.clickItem,
+      adjustTimeMs: adjustTimeMs ?? this.adjustTimeMs,
     );
   }
 }
