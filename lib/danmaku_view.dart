@@ -654,11 +654,15 @@ class _DanmakuViewState extends State<DanmakuView>
         updateDanmakuCanvasHeight(constraints.maxHeight);
       }
       return ClipRect(
-        child: GestureDetector(
-          onTapDown: (details) {
+        child: Listener(
+          onPointerDown: (details) {
             debugPrint("点击了弹幕坐标：${details.localPosition}");
             _clickCanvas(details.localPosition);
           },
+          // onTapDown: (details) {
+          //   debugPrint("点击了弹幕坐标：${details.localPosition}");
+          //   _clickCanvas(details.localPosition);
+          // },
           child: Stack(
             children: [
               RepaintBoundary(
