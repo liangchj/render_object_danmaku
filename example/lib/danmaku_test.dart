@@ -18,6 +18,7 @@ class _DanmakuTestState extends State<DanmakuTest> {
   bool _filterBottom = false;
   bool _filterScroll = false;
   bool _filterColour = false;
+  double _strokeWidth = 0.0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,6 +63,21 @@ class _DanmakuTestState extends State<DanmakuTest> {
                     });
                     _controller.onUpdateOption(
                         _controller.option.copyWith(area: area));
+                  },
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+                child: Slider(
+                  value: _strokeWidth,
+                  min: 0,
+                  max: 3.0,
+                  onChanged: (value) {
+                    setState(() {
+                      _strokeWidth = value;
+                    });
+                    _controller.onUpdateOption(
+                        _controller.option.copyWith(strokeWidth: _strokeWidth));
                   },
                 ),
               ),

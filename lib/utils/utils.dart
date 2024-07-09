@@ -1,5 +1,6 @@
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:render_object_danmaku/models/canvas_danmaku_item.dart';
 import 'package:render_object_danmaku/models/danmaku_item.dart';
 import 'package:render_object_danmaku/models/danmaku_option.dart';
@@ -113,6 +114,7 @@ class Utils {
         color: Color(danmakuItem.color),
       ))
       ..addText(danmakuItem.content);
+
     return builder.build()
       ..layout(ui.ParagraphConstraints(width: danmakuWidth));
   }
@@ -120,9 +122,9 @@ class Utils {
   static generateStrokeParagraph(DanmakuItem danmakuItem, double danmakuWidth,
       double fontSize, double strokeWidth) {
     final Paint strokePaint = Paint()
-      ..style = PaintingStyle.stroke
+      ..style = strokeWidth > 0 ? PaintingStyle.stroke : PaintingStyle.fill
       ..strokeWidth = strokeWidth
-      ..color = Colors.black;
+      ..color = Color(danmakuItem.color);
 
     final ui.ParagraphBuilder strokeBuilder =
         ui.ParagraphBuilder(ui.ParagraphStyle(
@@ -134,7 +136,6 @@ class Utils {
             foreground: strokePaint,
           ))
           ..addText(danmakuItem.content);
-
     return strokeBuilder.build()
       ..layout(ui.ParagraphConstraints(width: danmakuWidth));
   }

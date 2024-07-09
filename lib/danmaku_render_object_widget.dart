@@ -195,7 +195,7 @@ class _DanmakuRenderBox extends RenderBox {
   }
 
   @override
-  bool get isRepaintBoundary => false;
+  bool get isRepaintBoundary => true;
 
   @override
   bool hitTestSelf(Offset position) => true;

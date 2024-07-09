@@ -76,7 +76,7 @@ class _DanmakuViewState extends State<DanmakuView>
   DateTime? _startTime;
 
   /// 点击可以悬停时长（毫秒）
-  int _clickPauseTimeMs = 5000;
+  final int _clickPauseTimeMs = 5000;
   // 点击的定时器
   Timer? _clickTimer;
 
@@ -94,6 +94,7 @@ class _DanmakuViewState extends State<DanmakuView>
       onPause: pause,
       onResume: resume,
       onClear: clearDanmakus,
+      onGetDanmakus: getDanmakus,
     );
     _controller.option = _option;
     _controller.runTime = 0;
@@ -351,7 +352,6 @@ class _DanmakuViewState extends State<DanmakuView>
       _controller.runTime += _option.adjustTimeMs;
     }
 
-    /// 清理已经存在的 Paragraph 缓存
     _animationController.stop();
     // 显示区域或文本大小发生变化时更新弹幕轨道信息
     if (oldOption.area != _option.area ||
@@ -395,6 +395,22 @@ class _DanmakuViewState extends State<DanmakuView>
         }
       }
       updateDanmakuCanvasHeight(_viewHeight);
+    } else {
+      if (_option.strokeWidth != oldOption.strokeWidth) {
+        for (var entry in _timeCanvasDanmakuItems.entries) {
+          if (entry.value.isEmpty) {
+            continue;
+          }
+          for (List<CanvasDanmakuItem> list in entry.value.values) {
+            if (list.isEmpty) {
+              continue;
+            }
+            for (var item in list) {
+              item.paragraph = null;
+            }
+          }
+        }
+      }
     }
 
     // 检查是否修改了过滤
@@ -649,6 +665,10 @@ class _DanmakuViewState extends State<DanmakuView>
       }
     }
     return flag;
+  }
+
+  Map<int, Map<int, List<CanvasDanmakuItem>>> getDanmakus() {
+    return _timeCanvasDanmakuItems;
   }
 
   @override

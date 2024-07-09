@@ -1,3 +1,4 @@
+import 'package:render_object_danmaku/models/canvas_danmaku_item.dart';
 import 'package:render_object_danmaku/models/danmaku_item.dart';
 import 'package:render_object_danmaku/models/danmaku_option.dart';
 import 'package:render_object_danmaku/parse/base_danmaku_parser.dart';
@@ -18,6 +19,7 @@ class DanmakuController {
   final Function onPause;
   final Function onResume;
   final Function onClear;
+  final Function() onGetDanmakus;
 
   DanmakuController({
     required this.onAddDanmaku,
@@ -28,6 +30,7 @@ class DanmakuController {
     required this.onPause,
     required this.onResume,
     required this.onClear,
+    required this.onGetDanmakus,
   });
 
   bool _running = true;
@@ -99,5 +102,10 @@ class DanmakuController {
   /// 更新弹幕配置
   void updateOption(DanmakuOption option) {
     onUpdateOption.call(option);
+  }
+
+  /// 添加弹幕
+  Map<int, Map<int, List<CanvasDanmakuItem>>> getDanmakus() {
+    return onGetDanmakus.call();
   }
 }

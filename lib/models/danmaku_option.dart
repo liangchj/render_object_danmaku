@@ -11,7 +11,7 @@ class DanmakuOption {
   /// 不透明度，0.1-1.0
   final double opacity;
 
-  /// 文字描边宽带
+  /// 文字描边宽度
   final double strokeWidth;
 
   /// 海量弹幕模式 (弹幕轨道占满时进行叠加)

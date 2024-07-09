@@ -62,8 +62,10 @@ class CanvasDanmakuItem {
         option.boldWidth * 2.0;
 
     width = textPainter.width + height - option.verticalMargin * 2.0;
-    paragraph = Utils.generateParagraph(
-        danmakuItem, textPainter.width, option.fontSize);
+    // paragraph = Utils.generateParagraph(
+    //     danmakuItem, textPainter.width, option.fontSize);
+    paragraph = Utils.generateStrokeParagraph(
+        danmakuItem, textPainter.width, option.fontSize, option.strokeWidth);
     drawn = false;
     return paragraph!;
   }
