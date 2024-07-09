@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -157,7 +158,17 @@ class Utils {
     if (red == 255 && green == 255 && blue == 255) {
       return false;
     }
-    return red != green && green != blue && blue != red;
+    // 有些颜色判断不出来
+    // return red != green && green != blue && blue != red;
+
+    // 计算 RGB 分量之间的最大和最小差值
+    int maxVal = max(red, max(green, blue));
+    int minVal = min(red, min(green, blue));
+    int diff = maxVal - minVal;
+
+    // 如果最大和最小差值大于某个阈值（例如 64），则认为颜色足够多彩
+    // 这个阈值可以根据需要调整
+    return diff > 64;
   }
 
   static bool isColorFulByColor(Color color) {
